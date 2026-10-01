@@ -1,6 +1,6 @@
 # Sunil Automobile and Electrician
 
-A white automotive website with five static pages: Home, Services, About, Gallery and Contact. The name and contact information follow the latest user instructions.
+A lightweight, white automotive single-page application with five prerendered routes: Home, Services, About, Gallery and Contact. The name and contact information follow the latest user instructions.
 
 ## Local development
 
@@ -11,6 +11,12 @@ npm run dev
 ```
 
 Open http://127.0.0.1:4173. Edit content in `build.mjs`, appearance in `src/style.css`, and interactions in `src/app.js`. Generated pages and local assets live in `dist/`.
+
+## Navigation architecture
+
+The browser keeps one persistent application shell and switches main content through the History API, without full page reloads. A small route bundle is prefetched during idle time and on navigation intent, then cached in memory. Revisited routes use cached templates. Header, footer, fonts and shared assets persist. Browser Back/Forward, service fragments, focus and scroll restoration are supported. Page observers/listeners are cleaned up on navigation.
+
+Each route also has complete prerendered HTML, unique metadata and a direct-load URL for SEO and no-JavaScript/fetch-failure fallbacks. No production framework or navigation dependency was added. The static host needs no catch-all routing rule.
 
 ## Current content
 
@@ -30,7 +36,7 @@ The old standalone location route was removed. Supplied contact details have not
 
 Unique titles/descriptions, static content, canonical URLs, Open Graph text, factual AutoRepair structured data with telephone/email and the current address, and a five-page sitemap. Set SITE_URL to the final origin before rebuilding for another host. Search indexing requires a public website.
 
-`npm run check` checks JavaScript syntax. `qa.mjs` uses Playwright and installed Chrome to verify five pages at eight widths from 360 to 1920 pixels, service selection, contact links, removed routes and no-JavaScript fallbacks. Google Maps is replaced with a labelled placeholder during screenshots; third-party map rendering is not covered by those screenshots. Results are in ignored `.qa/`.
+`npm run check` checks JavaScript syntax. `qa.mjs` uses Playwright and installed Chrome to verify five pages at eight widths from 360 to 1920 pixels, service selection, contact links, removed routes and no-JavaScript fallbacks. `qa-spa.mjs` verifies persistent shell/document identity, route caching and metadata, repeated gallery mounts, service deep links, mobile navigation, Back/Forward scroll, rapid-click races, reduced motion and failed-prefetch fallback. Google Maps is replaced with a labelled placeholder during tests; third-party map rendering is not covered by those screenshots. Results are in ignored `.qa/`. The QA scripts require Playwright and a running local server.
 
 ## Photography and font
 
