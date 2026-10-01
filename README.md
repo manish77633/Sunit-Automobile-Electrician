@@ -1,8 +1,8 @@
-# Sunil Automobile
+# Sunil Automobile and Electrician
 
-A six-page, white-theme automotive website based on the supplied visual reference. Built as static HTML with self-hosted Manrope, optimized WebP photographs, CSS animations and small progressive-enhancement JavaScript. No production JavaScript dependencies.
+A white automotive website with five static pages: Home, Services, About, Gallery and Contact. The name and contact information follow the latest user instructions.
 
-## Run locally
+## Local development
 
 ```powershell
 $env:SITE_URL = 'https://sunil-automobile-jaipur.a3logics-2296.chatgpt.site'
@@ -10,22 +10,30 @@ npm run build
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. `build.mjs` generates crawlable pages in `dist/`; edit page content there in the source generator, and edit appearance/behavior in `src/style.css` and `src/app.js`.
+Open http://127.0.0.1:4173. Edit content in `build.mjs`, appearance in `src/style.css`, and interactions in `src/app.js`. Generated pages and local assets live in `dist/`.
 
-## Pages and behavior
+## Current content
 
-- Home, Services, About, Gallery, Location and Contact.
-- Ten services with keyboard-accessible selection and shareable fragment links.
-- Gallery category filters and native dialog lightbox with Escape, arrow navigation and restored focus.
-- Google Maps address search, directions and embedded map.
-- Enquiry validation, service prefill and a text-file download. **No delivery backend is connected; enquiries are never marked as sent.** No personal data is persisted.
-- Hero sequence, subtle desktop scroll parallax, viewport reveals, diagnostic scan, airflow/electrical accents and timeline entrance. Reduced-motion support and readable content without JavaScript.
+- Name: Sunil Automobile and Electrician.
+- Telephone: 094146 06756; click-to-call uses +91 94146 06756.
+- Email: sunilautomobile896@gmail.com.
+- Supplied address, preserved as written: A48 Ayodhya Nagar Ghandi Path Test, Vaishali Nagar, Jaipur, Rajasthan, 302021.
+- Nine services: Auto Repair; Air & Cabin Filter Replacement; Vehicle Engine Diagnostic; Battery; Brakes; Electrical; Oil Change; Steering & Suspension Repair; Transmission.
+- Contact combines direct phone/email links, office address, map and directions. No enquiry form.
+- Services use top navigation and one selected detail, with no duplicate left list. The services are also accessible from the header dropdown and mobile navigation.
+- Before You Visit FAQs, gallery filtering/lightbox, accessible navigation, scroll reveals and reduced-motion support.
 
-## Accuracy and assets
+The old standalone location route was removed. Supplied contact details have not been independently verified; no opening hours, certifications, prices or guarantees were invented.
 
-Business name, address, ten services, 3.7/5 rating, three reviews and truncated review excerpt come from the user-supplied brief. They have not been independently verified. The supplied opening status is labelled as listing information, not a live status. No telephone, email, certifications, prices, pickup/drop or guarantees were invented.
+## SEO and verification
 
-Photographs are illustrative stock images, **not photographs of this business**. Replace them with authorized original workshop photographs when available. Image sources:
+Unique titles/descriptions, static content, canonical URLs, Open Graph text, factual AutoRepair structured data with telephone/email and the current address, and a five-page sitemap. Set SITE_URL to the final origin before rebuilding for another host. Search indexing requires a public website.
+
+`npm run check` checks JavaScript syntax. `qa.mjs` uses Playwright and installed Chrome to verify five pages at eight widths from 360 to 1920 pixels, service selection, contact links, removed routes and no-JavaScript fallbacks. Google Maps is replaced with a labelled placeholder during screenshots; third-party map rendering is not covered by those screenshots. Results are in ignored `.qa/`.
+
+## Photography and font
+
+Photographs are illustrative stock images, not photographs of this business. Replace them with authorized original workshop photography when available.
 
 - https://www.pexels.com/photo/a-mechanic-fixing-a-car-engine-8985456/
 - https://www.pexels.com/photo/person-in-black-long-sleeves-repairing-the-car-engine-4315574/
@@ -34,16 +42,4 @@ Photographs are illustrative stock images, **not photographs of this business**.
 - https://www.pexels.com/photo/a-mechanic-working-on-a-car-engine-8986041/
 - https://www.pexels.com/photo/person-looking-at-the-engine-of-a-car-8478213/
 
-Pexels license: https://www.pexels.com/license/ . Manrope is distributed under the SIL Open Font License; font license and attribution are included with the assets.
-
-## SEO
-
-Static page content, one H1 per page, unique titles/descriptions, canonical URLs, Open Graph text, robots.txt, sitemap.xml and factual AutoRepair JSON-LD. No unverified review structured data, coordinates or opening schedule. Set `SITE_URL` to the actual final origin before rebuilding for another host.
-
-The Sites publication begins private. **Search indexing requires a public website**; metadata alone does not guarantee ranking or indexing.
-
-## Validation
-
-`npm run check` validates JavaScript syntax. `qa.mjs` uses Playwright with installed Google Chrome to verify six pages at 360, 390, 430, 768, 1024, 1280, 1440 and 1920 pixels. It checks overflow, metadata, page headings, runtime errors and key interactions. Google Maps is replaced by a clearly labelled test placeholder during automated local screenshots; the third-party map itself is not covered by those screenshots. Results are stored in ignored `.qa/`.
-
-The advanced 3D vehicle disassembly/video phase is not implemented; it requires suitable authorized layered/3D/video assets. The complete website and lightweight motion remain usable without those assets.
+Pexels license: https://www.pexels.com/license/ . Manrope uses the SIL Open Font License, included in `dist/assets/Manrope-OFL.txt`.

@@ -28,34 +28,39 @@
   }
   window.addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(scrollUpdate);}},{passive:true});
   scrollUpdate();
-  const serviceData=$('#service-data');
-  if(serviceData){
-    const services=JSON.parse(serviceData.textContent);
-    const detail=$('#service-detail');
-    let activeId='auto-repair';
-    function selectService(id,{updateUrl=false,focusPanel=false}={}){
-      const service=services.find(s=>s.id===id);if(!service)return;
-      const changed=activeId!==id;activeId=id;
-      $$('[data-service]').forEach(b=>{const active=b.dataset.service===id;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});
-      $$('[data-service-shortcut]').forEach(b=>{const active=b.dataset.serviceShortcut===id;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
-      detail.dataset.active=id;
-      $('#service-title').textContent=service.title;
-      $('#service-description').textContent=service.description;
-      $('#service-detail-number').textContent=String(service.number).padStart(2,'0')+' / VEHICLE CARE';
-      $('#service-icon').innerHTML=service.icon;
-      const picture=$('#service-image');picture.src='/assets/'+service.image+'.webp';picture.alt=service.title+' automotive detail';
-      $('#service-points').replaceChildren(...service.points.map(text=>{const li=document.createElement('li');li.innerHTML='<svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>';li.append(document.createTextNode(text));return li;}));
-      $('#service-enquiry').href='/contact/?service='+service.id;
-      if(changed&&!reducedMotion.matches){picture.classList.remove('image-changing');detail.classList.remove('is-switching');requestAnimationFrame(()=>{picture.classList.add('image-changing');detail.classList.add('is-switching');});}
-      if(updateUrl)history.replaceState(null,'','#'+id);
-      if(focusPanel&&window.innerWidth<768)detail.scrollIntoView({behavior:reducedMotion.matches?'auto':'smooth',block:'start'});
+
+  const serviceDropdown = $('#header-services');
+  const serviceToggle = $('.services-menu-toggle');
+  function closeServicesMenu() {
+    if(!serviceDropdown) return;
+    serviceDropdown.hidden=true;
+    serviceToggle.setAttribute('aria-expanded','false');
+  }
+  serviceToggle?.addEventListener('click',()=>{
+    const open=serviceToggle.getAttribute('aria-expanded')!=='true';
+    serviceToggle.setAttribute('aria-expanded',String(open));
+    serviceDropdown.hidden=!open;
+  });
+  document.addEventListener('click',e=>{if(!e.target.closest('.nav-services'))closeServicesMenu();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&serviceToggle?.getAttribute('aria-expanded')==='true'){closeServicesMenu();serviceToggle.focus();}});
+  $$('.services-dropdown a').forEach(a=>a.addEventListener('click',closeServicesMenu));
+  const tabs=$$('[data-service-tab]');
+  const panels=$$('[data-service-panel]');
+  if(tabs.length){
+    const validIds=tabs.map(t=>t.dataset.serviceTab);
+    function selectService(id,scroll=false){
+      if(!validIds.includes(id))id=validIds[0];
+      tabs.forEach(t=>{const active=t.dataset.serviceTab===id;if(active)t.setAttribute('aria-current','true');else t.removeAttribute('aria-current');});
+      panels.forEach(panel=>{
+        const active=panel.dataset.servicePanel===id;panel.hidden=!active;
+        if(active&&!reducedMotion.matches){panel.classList.remove('panel-enter');requestAnimationFrame(()=>panel.classList.add('panel-enter'));}
+      });
+      if(scroll)document.querySelector('.service-tabs').scrollIntoView({behavior:reducedMotion.matches?'auto':'smooth',block:'start'});
     }
-    $$('[data-service]').forEach(b=>b.addEventListener('click',()=>selectService(b.dataset.service,{updateUrl:true,focusPanel:true})));
-    $$('[data-service-shortcut]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.serviceShortcut;if(id==='all'){selectService('auto-repair',{updateUrl:true});$$('[data-service-shortcut]').forEach(x=>{const a=x.dataset.serviceShortcut==='all';x.classList.toggle('active',a);x.setAttribute('aria-pressed',String(a));});}else selectService(id,{updateUrl:true,focusPanel:true});}));
-    const fromHash=()=>{const id=decodeURIComponent(location.hash.slice(1));if(services.some(s=>s.id===id))selectService(id);};
-    window.addEventListener('hashchange',fromHash);fromHash();
-    const hashService=services.some(s=>s.id===location.hash.slice(1));
-    if(hashService)requestAnimationFrame(()=>detail.scrollIntoView({behavior:'auto',block:'start'}));
+    function hashService(){let id='';try{id=decodeURIComponent(location.hash.slice(1));}catch{}selectService(id);}
+    tabs.forEach(t=>t.addEventListener('click',e=>{e.preventDefault();history.replaceState(null,'','#'+t.dataset.serviceTab);selectService(t.dataset.serviceTab);if(innerWidth<768)t.scrollIntoView({behavior:reducedMotion.matches?'auto':'smooth',block:'nearest',inline:'nearest'});}));
+    window.addEventListener('hashchange',hashService);
+    hashService();
   }
   const lightbox=$('#lightbox');
   if(lightbox){
@@ -71,22 +76,5 @@
     lightbox.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();showImage(galleryIndex+1);}if(e.key==='ArrowLeft'){e.preventDefault();showImage(galleryIndex-1);}});
     lightbox.addEventListener('close',()=>lastTrigger?.focus());
     $$('[data-gallery-filter]').forEach(b=>b.addEventListener('click',()=>{const category=b.dataset.galleryFilter;$$('[data-gallery-filter]').forEach(x=>{const a=x===b;x.classList.toggle('active',a);x.setAttribute('aria-pressed',String(a));});$$('.gallery-item').forEach(item=>{item.hidden=category!=='all'&&item.dataset.category!==category;item.classList.add('is-visible');});}));
-  }
-  const form=$('#enquiry-form');
-  if(form){
-    $('.form-submit',form).disabled=false;
-    const service=new URLSearchParams(location.search).get('service');if(service&&$$('#service option').some(o=>o.value===service))$('#service').value=service;
-    const phone=$('#phone');
-    function validatePhone(){const digits=phone.value.replace(/\D/g,'');phone.setCustomValidity(digits.length>=10&&digits.length<=15?'':'Enter a phone number with 10–15 digits.');}
-    phone.addEventListener('input',validatePhone);
-    let draft='';
-    form.addEventListener('submit',e=>{
-      e.preventDefault();validatePhone();if(!form.reportValidity())return;
-      const data=new FormData(form);
-      draft=['SERVICE ENQUIRY — SUNIL AUTOMOBILE','Not sent — prepared locally in your browser','',`Name: ${data.get('name').trim()}`,`Phone: ${data.get('phone').trim()}`,`Vehicle: ${data.get('vehicle').trim()}`,`Service: ${$('#service').selectedOptions[0].textContent}`,`Message: ${data.get('message').trim()}`,'','Workshop: Gandhi Path Rd, Lalarpura, Jaipur, Rajasthan 302021'].join('\r\n');
-      $('#form-result').hidden=false;$('#form-result').scrollIntoView({behavior:reducedMotion.matches?'auto':'smooth',block:'nearest'});
-    });
-    form.addEventListener('input',()=>{$('#form-result').hidden=true;draft='';});
-    $('#download-enquiry').addEventListener('click',()=>{if(!draft)return;const url=URL.createObjectURL(new Blob([draft],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='sunil-automobile-service-enquiry.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
   }
 })();
