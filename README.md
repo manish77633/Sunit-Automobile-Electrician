@@ -14,11 +14,12 @@ Open http://127.0.0.1:4173. Edit content in `build.mjs`, appearance in `src/styl
 
 ## Current content
 
-- Name: Sunil Automobile and Electrician.
+- Name: Sunil Automobile and Electrician. The business name and logo omit the service suffix; air conditioning remains an offered service.
+- Homepage service cards use automotive photographs in place of service icons.
 - Telephone: 094146 06756; click-to-call uses +91 94146 06756.
 - Email: sunilautomobile896@gmail.com.
 - Supplied address, preserved as written: A48 Ayodhya Nagar Ghandi Path Test, Vaishali Nagar, Jaipur, Rajasthan, 302021.
-- Nine services: Auto Repair; Air & Cabin Filter Replacement; Vehicle Engine Diagnostic; Battery; Brakes; Electrical; Oil Change; Steering & Suspension Repair; Transmission.
+- Ten services: Auto Repair; Air & Cabin Filter Replacement; Air Conditioning; Vehicle Engine Diagnostic; Battery; Brakes; Electrical; Oil Change; Steering & Suspension Repair; Transmission.
 - Contact combines direct phone/email links, office address, map and directions. No enquiry form.
 - Services use top navigation and one selected detail, with no duplicate left list. The services are also accessible from the header dropdown and mobile navigation.
 - Before You Visit FAQs, gallery filtering/lightbox, accessible navigation, scroll reveals and reduced-motion support.
