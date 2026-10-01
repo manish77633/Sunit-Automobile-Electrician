@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sunil-automobile-jaipur.a3logics-2296.chatgpt.site/sitemap.xml

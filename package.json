@@ -1,0 +1,11 @@
+{
+  "name": "sunil-automobile",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node server.mjs",
+    "check": "node --check src/app.js && node --check build.mjs"
+  }
+}
