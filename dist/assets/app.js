@@ -91,12 +91,85 @@
     }, 150);
   }, { passive: true });
 
+  function mountTextRoll(signal) {
+    const word = $('[data-text-roll]', main);
+    if (!word || !Element.prototype.animate || !('IntersectionObserver' in window)) return;
+    const text = word.textContent;
+    const label = document.createElement('span');
+    label.className = 'sr-only';
+    label.textContent = text;
+    const visual = document.createElement('span');
+    visual.className = 'text-roll-visual';
+    visual.setAttribute('aria-hidden', 'true');
+    const characters = Array.from(text, character => {
+      const cell = document.createElement('span');
+      cell.className = 'text-roll-character';
+      const outgoing = document.createElement('span');
+      outgoing.className = 'text-roll-glyph';
+      outgoing.textContent = character;
+      const incoming = outgoing.cloneNode(true);
+      incoming.classList.add('text-roll-incoming');
+      cell.append(outgoing, incoming);
+      visual.append(cell);
+      return { outgoing, incoming };
+    });
+    word.replaceChildren(label, visual);
+    let timer, animations = [], generation = 0, enabled = false, inView = false, firstRun = true;
+    function stop() {
+      generation++;
+      clearTimeout(timer);
+      animations.forEach(animation => animation.cancel());
+      animations = [];
+    }
+    async function roll() {
+      if (!enabled || signal.aborted) return;
+      const current = ++generation;
+      // Match the supplied TextRoll duration, stagger and easing. Percentages
+      // keep the whole glyph inside its rolling window at every heading size.
+      animations = characters.flatMap(({ outgoing, incoming }, index) => {
+        const timing = { duration: 300, easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)', fill: 'both' };
+        return [
+          outgoing.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(100%)' }], { ...timing, delay: index * 50 }),
+          incoming.animate([{ transform: 'translateY(-100%)' }, { transform: 'translateY(0)' }], { ...timing, delay: index * 50 + 50 }),
+        ];
+      });
+      await Promise.all(animations.map(animation => animation.finished.catch(() => {})));
+      if (current !== generation || signal.aborted || !enabled) return;
+      animations.forEach(animation => animation.cancel());
+      animations = [];
+      timer = setTimeout(roll, 2000);
+    }
+    function sync() {
+      const next = inView && !document.hidden && !reducedMotion.matches && !signal.aborted;
+      if (next === enabled) return;
+      enabled = next;
+      stop();
+      if (enabled) {
+        timer = setTimeout(roll, firstRun && !document.documentElement.dataset.clientNavigation ? 1500 : 150);
+        firstRun = false;
+      }
+    }
+    const observer = new IntersectionObserver(entries => {
+      inView = entries[0].isIntersecting;
+      sync();
+    });
+    observer.observe(word);
+    document.addEventListener('visibilitychange', sync, { signal });
+    reducedMotion.addEventListener('change', sync, { signal });
+    signal.addEventListener('abort', () => {
+      enabled = false;
+      stop();
+      observer.disconnect();
+    }, { once: true });
+  }
+
   function mountPage() {
     pageLifetime?.abort();
     pageLifetime = new AbortController();
     const options = { signal: pageLifetime.signal };
     hero = $('.hero', main);
     heroImage = $('.hero-visual img', main);
+    mountTextRoll(pageLifetime.signal);
     pageSyncHash = () => {};
     const tabs = $$('[data-service-tab]', main);
     const panels = $$('[data-service-panel]', main);
